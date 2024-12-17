@@ -1,126 +1,118 @@
-# velvet-video
-Java library for encoding/decoding/muxing/demuxing video and audio. The API is high level, so the library users do not need to dive deep into  details of video/audio encoding technology.
+# velvet-video-remastered
 
-In particular, with velvet-video it's easy to:
-- create video from still images
-- extract frames from a video
-- extract audio tracks from video files
-- remux video or audio from one container format to another (like mp4 to mkv)
-- transcode (recompress) videos/audios using another codec (like x264 to vp9 or wav to mp3)
-- change video timing (slo-mo, timelapse etc)
-- merge videos or split them to segments
-- apply filters of transformations (before encoding or after decoding)
+### A Maintained Fork of [zakgof/velvet-video](https://github.com/zakgof/velvet-video)
 
-velvet-video supports dozens of container formats (including mp4, avi, webm, matroska) and codecs (including x264, hevc, vp9, av1).
+`velvet-video-remastered` is a Java library for encoding, decoding, muxing, and demuxing video and audio. It builds on the original `velvet-video` library, now maintained and extended to ensure compatibility with modern systems and to incorporate updates where possible.
 
+The library provides a high-level API, abstracting the complexities of video and audio encoding technology. It’s designed to be user-friendly and versatile.
 
-[![Travis CI](https://travis-ci.org/zakgof/velvet-video.svg?branch=release)](https://travis-ci.org/zakgof/velvet-video)
-[![velvet-video on bintray](https://api.bintray.com/packages/zakgof/maven/velvet-video/images/download.svg)](https://bintray.com/zakgof/maven/velvet-video)
+---
 
-velvet-video embeds FFmpeg libraries under the hood, so it works at native speed and uses all FFmpeg's hardware optimization.
-Extracting and loading native libs is fully covered by velvet-video.
+## Key Features
 
-Supported platforms:    
- - Windows 64 bit
- - Linux 64 bit
- 
-Please contact me if you need support for a platform not listed here. 
+With `velvet-video-remastered`, you can easily:
 
-## Setup
+- Create videos from still images
+- Extract frames from videos
+- Extract audio tracks from video files
+- Remux video/audio between container formats (e.g., MP4 to MKV)
+- Transcode (recompress) video/audio using different codecs (e.g., x264 to VP9, WAV to MP3)
+- Adjust video timing (e.g., slow motion, timelapse)
+- Merge videos or split them into segments
+- Apply filters or transformations (before encoding or after decoding)
 
-To use `velvet-video` add the core dependency plus an appropriate native FFmpeg components package. `velvet-video` is available on [Maven Central](https://mvnrepository.com/artifact/com.github.zakgof/velvet-video?repo=jcenter)
+**Supported Formats and Codecs:**
+- **Containers:** MP4, AVI, WebM, Matroska, and more
+- **Codecs:** x264, HEVC, VP9, AV1, and others
 
-The choice for native package is:
+**Performance:**  
+`velvet-video-remastered` uses embedded FFmpeg libraries, ensuring native speed with hardware optimizations.
 
-- `velvet-video-natives:free`
-   - only royalty-free components are included
-   - encoders/decoders: Google VP8 and VP9, AOM av1
-   - muxers/demuxers: webm, mkv, ogg
+---
 
-- `velvet-video-natives:full`
-   - maximum FFmpeg functionality included
-   - the included components use patented technologies and may require royalty fees for commercial usage
+## Installation
 
-### gradle
-````groovy
-dependencies {
-    compile 'com.github.zakgof:velvet-video:0.5.2'
-    compile 'com.github.zakgof:velvet-video-natives:0.2.8.full'
-}
-````
-### maven
-````xml
-<dependency>
-  <groupId>com.github.zakgof</groupId>
-  <artifactId>velvet-video</artifactId>
-  <version>0.5.2</version>
-  <type>pom</type>
-</dependency>
-<dependency>
-  <groupId>com.github.zakgof</groupId>
-  <artifactId>velvet-video-natives</artifactId>
-  <version>0.2.8.full</version>
-  <type>pom</type>
-</dependency>
-````
+### Gradle
+To use the library, include the following dependency in your `build.gradle` file:
+```groovy
+implementation 'com.toxicstoxm.velvet-video-remastered:velvet-video-remastered:0.6.0'
+```
 
-## Quick start
+The artifact is available on [Maven Central](https://central.sonatype.com/artifact/com.toxicstoxm.velvet-video-remastered/velvet-video-remastered).
 
-### Encode images into a video:
+---
 
-````java
-    IVelvetVideoLib lib = VelvetVideoLib().getInstance();
-    try (IMuxer muxer = lib.muxer("matroska")
-        .video(lib.videoEncoder("libaom-av1").bitrate(800000))
-        .build(new File("/some/path/output.mkv"))) {
-             IEncoderVideoStream videoStream = muxer.videoStream(0);	        
-             videoStream.encode(image1);
-             videoStream.encode(image2);
-             videoStream.encode(image3);
-    }      
-````
-### Obtain images from a video:
+## Setup for FFmpeg Support
 
-````java
-	IVelvetVideoLib lib = VelvetVideoLib().getInstance();
-	try (IDemuxer demuxer = lib.demuxer(new File("/some/path/example.mp4"))) {
-	    IDecoderVideoStream videoStream = demuxer.videoStream(0);
-	    IFrame videoFrame;
-	    while ((videoFrame = videoStream.nextFrame()) != null) {
-	   	    BufferedImage image = videoFrame.image();
-	   	    // Use image as needed...
-	    }
-	}      
-````
-### More examples
- 
-https://github.com/zakgof/velvet-video/tree/master/src/example/java/com/zakgof/velvetvideo/example
+`velvet-video-remastered` requires FFmpeg native components.
 
-|                   Example        |                   Description               |
-|----------------------------------|---------------------------------------------|
-|  ImagesToVideoAndBack            | Extract frame images from a video + compose a video from images          |
-|  TranscodeVideoWithTimingEffects | Transcode a video using another codec and applying slomo  |
-|  RemuxVideo                      | Repackage a video into another container format without transcoding |
-|  ScreenCaptureToVideo            | Capture the whole desktop to video          |
-|  AudioPlayback                   | Play a compressed audio file                |
-|  ExtractAndTranscodeAudio        | Fetch audio tracks from a video file and save them as mp3 files              |
+Supported platforms:
+- Windows (64-bit)
+- Linux (64-bit)
 
+**Need support for another platform?** Feel free to reach out!
 
-### Advanced example: video player
+---
 
-See https://github.com/zakgof/velvet-video-player
+## Quick Start
 
-## License
+### Encode Images into a Video
+```java
+IVelvetVideoLib lib = VelvetVideoLib().getInstance();
+try (IMuxer muxer = lib.muxer("matroska")
+    .video(lib.videoEncoder("libaom-av1").bitrate(800000))
+    .build(new File("/some/path/output.mkv"))) {
+         IEncoderVideoStream videoStream = muxer.videoStream(0);        
+         videoStream.encode(image1);
+         videoStream.encode(image2);
+         videoStream.encode(image3);
+}      
+```
 
-`velvet-video-core` is dual-licensed under Apache 2.0 and GPL 3.0 (or any later version).
+### Extract Images from a Video
+```java
+IVelvetVideoLib lib = VelvetVideoLib().getInstance();
+try (IDemuxer demuxer = lib.demuxer(new File("/some/path/example.mp4"))) {
+    IDecoderVideoStream videoStream = demuxer.videoStream(0);
+    IFrame videoFrame;
+    while ((videoFrame = videoStream.nextFrame()) != null) {
+        BufferedImage image = videoFrame.image();
+        // Use image as needed...
+    }
+}      
+```
 
-To comply with the FFMpeg components license present bundles into `velvet-video-natives`, choose `Apache-2.0` when using with `velvet-video-natives:free` or `GPL-3.0-or-later` when using with `velvet-video-natives:full`
+---
 
-`SPDX-License-Identifier: Apache-2.0 OR GPL-3.0-or-later`
+## Examples and Use Cases
 
-`velvet-video-natives` binaries on jcenter are licensed:
+Comprehensive examples are available in the original repository:  
+[Examples Directory](https://github.com/zakgof/velvet-video/tree/master/src/example/java/com/zakgof/velvetvideo/example)
 
-- `velvet-video-natives:free` - under LGPL 3.0 or later
-- `velvet-video-natives:full` - under GPL 3.0 or later
+| Example                             | Description                                                      |
+|-------------------------------------|------------------------------------------------------------------|
+| **ImagesToVideoAndBack**            | Extract frame images from a video + compose a video from images. |
+| **TranscodeVideoWithTimingEffects** | Transcode a video using another codec and apply slow motion.     |
+| **RemuxVideo**                      | Repackage a video into another container without transcoding.    |
+| **ScreenCaptureToVideo**            | Capture the desktop as a video.                                  |
+| **AudioPlayback**                   | Play a compressed audio file.                                    |
+| **ExtractAndTranscodeAudio**        | Extract audio tracks from a video and save them as MP3 files.    |
 
-`velvet-video-natives` build scripts are licensed under Apache 2.0
+---
+
+## Advanced Example: Video Player
+
+For a fully functional video player example, visit:  
+[velvet-video-player](https://github.com/zakgof/velvet-video-player)
+
+---
+
+## Licensing
+
+`velvet-video-remastered` is dual-licensed under:
+
+- **Apache License 2.0**
+- **GPL 3.0 (or later)**
+
+**SPDX License Identifier:**  
+`Apache-2.0 OR GPL-3.0-or-later`
