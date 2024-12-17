@@ -1,148 +1,82 @@
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
-    id 'java'
-    id "io.freefair.lombok" version "4.1.4"
-    
-    id 'maven'
-    id 'maven-publish'
-    id 'signing'
-    id 'com.adarshr.test-logger' version '1.6.0'
+    id 'java-library'
+    id "com.vanniktech.maven.publish" version "0.30.0"
 }
 
-def ossrhUser = hasProperty('ossrhUsername') ? ossrhUsername : System.getenv('ossrhUsername')
-def ossrhPass = hasProperty('ossrhPassword') ? ossrhPassword : System.getenv('ossrhPassword')
+group = 'com.toxicstoxm.velvet-video-remastered'
+version = '0.5.3'
 
-compileJava.options.encoding = 'UTF-8'
-
-group = 'com.github.zakgof'
-archivesBaseName = 'velvet-video'
-version = '0.5.3-SNAPSHOT'
-def github = 'https://github.com/zakgof/velvet-video'
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-dependencies {
-	implementation 'org.slf4j:slf4j-api:2.0.0-alpha0'
-    implementation 'com.github.jnr:jnr-ffi:2.1.9'
-    implementation 'commons-io:commons-io:2.6'
-    implementation 'com.github.zakgof:tools:0.7.0'
-
-	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-api:5.3.1'
-    testRuntimeOnly 'com.github.zakgof:velvet-video-natives:0.2.7.full'
-    testRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha0'
-
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.3.1'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.5.2'
-    testImplementation 'com.github.fracpete:musicg:1.4.2.2'
+ext {
+    descr = 'Java video encoding/decoding/muxing/demuxing library'
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
-test {
-    useJUnitPlatform()
-    options {
-        systemProperties(System.getProperties())
-    }
+dependencies {
+    implementation 'org.slf4j:slf4j-api:2.0.0-alpha0'
+    implementation 'com.github.jnr:jnr-ffi:2.2.17'
+    implementation 'commons-io:commons-io:2.18.0'
+
+    compileOnly 'org.projectlombok:lombok:1.18.36'
+    annotationProcessor 'org.projectlombok:lombok:1.18.36'
+
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    implementation 'com.github.zakgof:velvet-video-natives:0.2.8.full'
+    testRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha0'
+
+    testImplementation 'com.github.fracpete:musicg:1.4.2.2'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.3'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-testlogger {
-    showStandardStreams true
-}
-
-sourceSets {
-    test {
-        java {
-            srcDirs = ['src/test/java', 'src/example/java']
-        }
-    }
-}
-
-task fatJar(type: Jar) {
-    baseName = 'velvet-video'
+tasks.register('fatJar', Jar) {
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
 
-ext {
-   descr = 'Java video encoding/decoding/muxing/demuxing library'
-}
+mavenPublishing {
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    signAllPublications()
 
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from javadoc
-}
+    coordinates("com.toxicstoxm.velvet-video-remastered", "velvet-video-remastered", version)
 
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-task testJar(type: Jar) {
-    classifier = 'tests'
-    from sourceSets.test.output
-}
-
-test {
-    exclude "**"
-}
-
-artifacts {
-    archives javadocJar, sourcesJar, testJar
-}
-
-signing {
-    sign configurations.archives
-}
-
-uploadArchives {
-  repositories {
-    mavenDeployer {
-      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-        authentication(userName: ossrhUser, password: ossrhPass)
-      }
-
-      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-        authentication(userName: ossrhUser, password: ossrhPass)
-      }
-
-      pom.project {
-        packaging 'jar'
-        artifactId 'velvet-video'
-        url 'https://github.com/zakgof/velvet-video'
-        
-        name 'velvet-video'
-        description descr
-
-        scm {
-          connection 'scm:git:${github}.git'
-          developerConnection 'scm:git:${github}.git'
-          url github
-        }
+    pom {
+        name = "velvet-video-remastered"
+        description = "Java video encoding/decoding/muxing/demuxing library"
+        inceptionYear = "2024"
+        url = "https://github.com/ToxicStoxm/velvet-video/"
 
         licenses {
-          license {
-            name 'The Apache License, Version 2.0'
-            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-          }
-          license {
-            name 'GNU General Public License v3.0'
-            url 'https://opensource.org/licenses/GPL-3.0'
-          }
+            license {
+                name = "The GNU General Public License, Version 3.0"
+                url = "https://www.gnu.org/licenses/gpl-3.0.html"
+                distribution = "https://www.gnu.org/licenses/gpl-3.0.html"
+            }
         }
 
         developers {
-          developer {
-            id 'zakgof'
-            name 'Oleksandr Zakusylo'
-            email 'zakgof@gmail.com'
-          }
+            developer {
+                id = "toxicstoxm"
+                name = "ToxicStoxm"
+                url = "https://github.com/ToxicStoxm"
+            }
+            developer {
+                id = "zakgof"
+                name = "Oleksandr Zakusylo"
+                url = "https://github.com/zakgof"
+                email = "zakgof@gmail.com"
+            }
         }
-      }
+
+        scm {
+            url = "https://github.com/ToxicStoxm/velvet-video-remastered.git"
+            connection = "scm:git:git://github.com/ToxicStoxm/velvet-video-remastered.git"
+            developerConnection = "scm:git:ssh://git@github.com/ToxicStoxm/velvet-video-remastered.git"
+        }
     }
-  }
 }
