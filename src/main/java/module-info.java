@@ -9,4 +9,5 @@ module com.toxicstoxm.velvet_video_remastered {
     exports com.toxicstoxm.velvet_video_remastered.impl.middle;
     exports com.toxicstoxm.velvet_video_remastered;
     exports com.toxicstoxm.velvet_video_remastered.impl;
+    exports com.toxicstoxm.velvet_video_remastered.tools;
 }
