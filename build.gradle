@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.toxicstoxm.velvet-video-remastered'
-version = '0.5.3'
+version = '0.6.0'
 
 ext {
     descr = 'Java video encoding/decoding/muxing/demuxing library'
