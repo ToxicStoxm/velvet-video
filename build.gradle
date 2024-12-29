@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.toxicstoxm.velvet-video-remastered'
-version = '0.6.1'
+version = '0.6.2'
 
 ext {
     descr = 'Java video encoding/decoding/muxing/demuxing library'
@@ -32,6 +32,18 @@ dependencies {
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.11.3'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.jar {
+    dependsOn('fatJar')
+}
+
+tasks.register('fatJar', Jar) {
+    archiveBaseName = "${rootProject.name}-fat"
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+
+    from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
 }
 
 mavenPublishing {
@@ -73,10 +85,5 @@ mavenPublishing {
             connection = "scm:git:git://github.com/ToxicStoxm/velvet-video-remastered.git"
             developerConnection = "scm:git:ssh://git@github.com/ToxicStoxm/velvet-video-remastered.git"
         }
-    }
-
-    tasks.register('fatJar', Jar) {
-        from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
-        with jar
     }
 }
