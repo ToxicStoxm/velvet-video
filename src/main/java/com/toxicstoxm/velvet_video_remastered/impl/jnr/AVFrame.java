@@ -35,8 +35,4 @@ public class AVFrame extends Struct {
 	int64_t reordered_opaque = new int64_t();
 	public Signed32 sample_rate = new Signed32();
 	public Unsigned64 channel_layout = new Unsigned64();
-
-
-
-
 }

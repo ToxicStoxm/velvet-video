@@ -2,6 +2,7 @@ package com.toxicstoxm.velvet_video_remastered.impl.middle;
 
 import com.toxicstoxm.velvet_video_remastered.impl.jnr.AVSampleFormat;
 import com.toxicstoxm.velvet_video_remastered.tools.MinFinder;
+import org.jetbrains.annotations.NotNull;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
@@ -34,7 +35,7 @@ public class BestMatchingAudioFormatConvertor implements Function<AudioFormat, A
 		return suggested;
 	}
 
-	private static float compare(AudioFormat suggested, AudioFormat format) {
+	private static float compare(@NotNull AudioFormat suggested, @NotNull AudioFormat format) {
 		float metric = 0;
 
 		int bitnessDiff = format.getSampleSizeInBits() - suggested.getSampleSizeInBits();
@@ -73,7 +74,7 @@ public class BestMatchingAudioFormatConvertor implements Function<AudioFormat, A
 		    .collect(Collectors.toSet());
 	}
 
-	public static AVSampleFormat findBest(Set<AVSampleFormat> supportedFormats, AudioFormat suggested) {
+	public static @NotNull AVSampleFormat findBest(Set<AVSampleFormat> supportedFormats, AudioFormat suggested) {
 		AVSampleFormat bestFormat = MinFinder.find(supportedFormats, format -> compare(suggested, format.toAudioFormat(0, -1))).get();
 		if (bestFormat != null) {
 			return bestFormat;

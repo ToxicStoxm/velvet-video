@@ -56,5 +56,4 @@ public interface IMuxerBuilder {
 	 * @return muxer instance
 	 */
 	IMuxer build(File outputFile);
-
 }

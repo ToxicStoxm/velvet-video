@@ -95,5 +95,4 @@ public interface LibAVFormat {
 		}
 		return formats;
 	}
-
 }

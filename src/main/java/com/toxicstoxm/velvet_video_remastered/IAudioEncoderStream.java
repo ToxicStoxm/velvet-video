@@ -24,5 +24,4 @@ public interface IAudioEncoderStream {
 	 * @return audio frame size, in bytes. Audio frame samples sent in {@link #encode(byte[])} should have this length (except the last frame that may be shorter).
 	 */
 	int frameBytes();
-
 }

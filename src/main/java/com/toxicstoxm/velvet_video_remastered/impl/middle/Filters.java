@@ -1,6 +1,7 @@
 package com.toxicstoxm.velvet_video_remastered.impl.middle;
 
 import com.toxicstoxm.velvet_video_remastered.impl.JNRHelper;
+import com.toxicstoxm.velvet_video_remastered.impl.Libraries;
 import com.toxicstoxm.velvet_video_remastered.impl.jnr.AVCodecContext;
 import com.toxicstoxm.velvet_video_remastered.impl.jnr.AVFrame;
 import com.toxicstoxm.velvet_video_remastered.impl.jnr.LibAVFilter;
@@ -13,13 +14,14 @@ import jnr.ffi.Pointer;
 import jnr.ffi.Struct;
 import jnr.ffi.byref.PointerByReference;
 import jnr.ffi.provider.jffi.NativeRuntime;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Filters implements AutoCloseable {
 
-	private final static LibAVFilter libavfilter = JNRHelper.load(LibAVFilter.class, "avfilter", 7);
-	private static final LibAVUtil libavutil = JNRHelper.load(LibAVUtil.class, "avutil", 56);
+	private final static LibAVFilter libavfilter = JNRHelper.load(LibAVFilter.class, Libraries.avfilter, Libraries.avfilter_version);
+	private static final LibAVUtil libavutil = JNRHelper.load(LibAVUtil.class, Libraries.avutil, Libraries.avutil_version);
 
 	private final Logger logFilter = LoggerFactory.getLogger("velvet-video.filter");
 
@@ -33,7 +35,7 @@ public class Filters implements AutoCloseable {
 	private final AVFilterGraph graph;
 	private AVFrame workframe;
 
-	public Filters(AVCodecContext codecCtx, String filterString) {
+	public Filters(@NotNull AVCodecContext codecCtx, String filterString) {
 
 		graph = libavfilter.avfilter_graph_alloc();
 

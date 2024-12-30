@@ -23,5 +23,4 @@ public interface IRemuxerBuilder {
 	 * @return this builder
 	 */
 	IRemuxerBuilder framerate(int framerate);
-
 }

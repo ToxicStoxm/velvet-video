@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.toxicstoxm.velvet-video-remastered'
-version = '0.6.2'
+version = '0.7.0'
 
 ext {
     descr = 'Java video encoding/decoding/muxing/demuxing library'
@@ -17,21 +17,17 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.slf4j:slf4j-api:2.0.0-alpha0'
+    implementation 'org.slf4j:slf4j-api:2.0.9'
     implementation 'com.github.jnr:jnr-ffi:2.2.17'
     implementation 'commons-io:commons-io:2.18.0'
 
     compileOnly 'org.projectlombok:lombok:1.18.36'
+    compileOnly 'org.jetbrains:annotations:24.0.0'
     annotationProcessor 'org.projectlombok:lombok:1.18.36'
-
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-api:5.3.1'
-    implementation 'com.github.zakgof:velvet-video-natives:0.2.8.full'
-    testRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha0'
+    annotationProcessor 'org.jetbrains:annotations:24.0.0'
+    testRuntimeOnly 'org.slf4j:slf4j-simple:2.0.9'
 
     testImplementation 'com.github.fracpete:musicg:1.4.2.2'
-
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.3'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.jar {
@@ -43,8 +39,10 @@ tasks.register('fatJar', Jar) {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 
     from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+
     with jar
 }
+
 
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)

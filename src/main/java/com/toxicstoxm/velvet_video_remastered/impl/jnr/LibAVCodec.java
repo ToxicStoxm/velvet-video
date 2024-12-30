@@ -6,6 +6,7 @@ import jnr.ffi.Pointer;
 import jnr.ffi.annotations.In;
 import jnr.ffi.annotations.Out;
 import jnr.ffi.byref.PointerByReference;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,25 +91,19 @@ public interface LibAVCodec {
 		return codecs;
 	}
 
-	// TODO: looks like shit
-	default boolean matches(AVCodec codec, Direction dir, MediaType mediaType) {
-		switch(mediaType) {
-			case Video: if (codec.type.get() != AVMEDIA_TYPE_VIDEO) return false; break;
-			case Audio: if (codec.type.get() != AVMEDIA_TYPE_AUDIO) return false; break;
-			case Subtitles: if (codec.type.get() != AVMEDIA_TYPE_SUBTITLE) return false; break;
-		}
+	default boolean matches(AVCodec codec, Direction dir, @NotNull MediaType mediaType) {
+		int requiredCodec = switch (mediaType) {
+			case Video -> AVMEDIA_TYPE_VIDEO;
+			case Audio -> AVMEDIA_TYPE_AUDIO;
+			case Subtitles -> AVMEDIA_TYPE_SUBTITLE;
+		};
 
-		switch (dir) {
-		case Decode:
-			return av_codec_is_decoder(codec) != 0;
-		case Encode:
-			return av_codec_is_encoder(codec) != 0;
-		case All:
-			return true;
-		}
-		return false;
-	}
+		if (codec.type.get() != requiredCodec) return false;
 
-
-
+        return switch (dir) {
+            case Decode -> av_codec_is_decoder(codec) != 0;
+            case Encode -> av_codec_is_encoder(codec) != 0;
+            case All -> true;
+        };
+    }
 }

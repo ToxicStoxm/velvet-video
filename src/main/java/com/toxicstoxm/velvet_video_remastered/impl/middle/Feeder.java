@@ -1,12 +1,15 @@
 package com.toxicstoxm.velvet_video_remastered.impl.middle;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class Feeder {
 
-	public static <I, O> O next(Supplier<I> source, Function<I, O> processor) {
+	public static <I, O> @Nullable O next(@NotNull Supplier<I> source, @NotNull Function<I, O> processor) {
 		for(;;) {
 			I input = source.get();
 			O result = processor.apply(input);
@@ -18,7 +21,7 @@ public class Feeder {
 		}
 	}
 
-	public static <I, O> void feed(I input, Function<I, O> processor, Consumer<O> output) {
+	public static <I, O> void feed(I input, @NotNull Function<I, O> processor, Consumer<O> output) {
 
 		for(;;) {
 			O result = processor.apply(input);
@@ -32,6 +35,4 @@ public class Feeder {
 			return;
 		}
 	}
-
-
 }

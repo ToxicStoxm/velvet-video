@@ -12,7 +12,7 @@ public class MemSeekableFile implements ISeekableOutput {
 
 	@Override
 	public void write(byte[] bytes) {
-		long bytesToAllocate = position + bytes.length - buffers.size() * CHUNK;
+		long bytesToAllocate = position + bytes.length - (long) buffers.size() * CHUNK;
 		if (bytesToAllocate > 0) {
 			long buffersToAllocate = ((bytesToAllocate - 1)/ CHUNK) * CHUNK + 1;
 			for (int i=0; i<buffersToAllocate; i++)
@@ -52,6 +52,4 @@ public class MemSeekableFile implements ISeekableOutput {
 		}
 		return result;
 	}
-
-
 }

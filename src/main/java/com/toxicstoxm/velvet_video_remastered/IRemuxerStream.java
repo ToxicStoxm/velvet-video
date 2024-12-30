@@ -10,6 +10,4 @@ public interface IRemuxerStream {
 	 * @param packetData raw packet bytes.
 	 */
 	void writeRaw(byte[] packetData);
-
-	// void writeRaw(IRawPacket rawPacket);
 }

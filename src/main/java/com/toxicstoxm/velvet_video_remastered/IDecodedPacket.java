@@ -49,5 +49,4 @@ public interface IDecodedPacket<S extends IDecoderStream<?, ?, ?>> {
 	 * @return duration of this frame, in nanoseconds
 	 */
 	long nanoduration();
-
 }

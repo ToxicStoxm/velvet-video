@@ -93,5 +93,4 @@ public interface IVelvetVideoLib {
 			throw new VelvetVideoException(e);
 		}
 	}
-
 }

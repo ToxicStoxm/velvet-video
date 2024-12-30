@@ -4,10 +4,12 @@ import com.toxicstoxm.velvet_video_remastered.IVideoDecoderStream;
 import com.toxicstoxm.velvet_video_remastered.IVideoFrame;
 import com.toxicstoxm.velvet_video_remastered.VelvetVideoException;
 import com.toxicstoxm.velvet_video_remastered.impl.JNRHelper;
+import com.toxicstoxm.velvet_video_remastered.impl.Libraries;
 import com.toxicstoxm.velvet_video_remastered.impl.VelvetVideoLib.DemuxerImpl;
 import com.toxicstoxm.velvet_video_remastered.impl.jnr.*;
 import jnr.ffi.Pointer;
 import jnr.ffi.Struct;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -23,8 +25,8 @@ public class VideoFrameHolder implements AutoCloseable, IFrameHolder {
 	private final int width;
 	private final int height;
 	private AVRational timebase;
-	private static final LibSwScale libswscale = JNRHelper.load(LibSwScale.class, "swscale",5);
-	private static final LibAVUtil libavutil = JNRHelper.load(LibAVUtil.class, "avutil", 56);
+	private static final LibSwScale libswscale = JNRHelper.load(LibSwScale.class, Libraries.swscale, Libraries.swscale_version);
+	private static final LibAVUtil libavutil = JNRHelper.load(LibAVUtil.class, Libraries.avutil, Libraries.avutil_version);
 
 	public VideoFrameHolder(int width, int height, AVPixelFormat srcFormat, AVPixelFormat destFormat,
 			AVRational timebase, boolean encode) {
@@ -36,7 +38,7 @@ public class VideoFrameHolder implements AutoCloseable, IFrameHolder {
 		scaleCtx = libswscale.sws_getContext(width, height, srcFormat, width, height, destFormat, 0, null, null, null);
 	}
 
-	public AVFrame alloc(int width, int height, AVPixelFormat format) {
+	public AVFrame alloc(int width, int height, @NotNull AVPixelFormat format) {
 		AVFrame f = libavutil.av_frame_alloc();
 		f.width.set(width);
 		f.height.set(height);
@@ -54,7 +56,7 @@ public class VideoFrameHolder implements AutoCloseable, IFrameHolder {
 		return frame;
 	}
 
-	public BufferedImage getPixels(AVFrame f) {
+	public BufferedImage getPixels(@NotNull AVFrame f) {
 		libavutil.checkcode(libswscale.sws_scale(scaleCtx, JNRHelper.ptr(f.data[0]), JNRHelper.ptr(f.linesize[0]), 0,
 				height, JNRHelper.ptr(biframe.data[0]), JNRHelper.ptr(biframe.linesize[0])));
 		BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
@@ -63,7 +65,7 @@ public class VideoFrameHolder implements AutoCloseable, IFrameHolder {
 		return bi;
 	}
 
-	private static byte[] bytesOf(BufferedImage image) {
+	private static byte[] bytesOf(@NotNull BufferedImage image) {
 		if (image.getType() != BufferedImage.TYPE_3BYTE_BGR) {
 			BufferedImage newimage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
 			Graphics2D g = newimage.createGraphics();

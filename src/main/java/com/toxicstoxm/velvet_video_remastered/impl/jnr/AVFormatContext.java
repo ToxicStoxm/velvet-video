@@ -16,12 +16,12 @@ public class AVFormatContext extends Struct {
 
     /**
      * I/O context.
-     *
+     * <p>
      * - demuxing: either set by the user before avformat_open_input() (then
      *             the user must close it manually) or set by avformat_open_input().
      * - muxing: set by the user before avformat_write_header(). The caller must
      *           take care of closing / freeing the IO context.
-     *
+     * <p>
      * Do NOT set this field if AVFMT_NOFILE flag is set in
      * iformat/oformat.flags. In such a case, the (de)muxer will handle
      * I/O in some other way and this field will be NULL.

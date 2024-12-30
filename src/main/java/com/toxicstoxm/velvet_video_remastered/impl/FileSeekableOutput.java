@@ -2,6 +2,7 @@ package com.toxicstoxm.velvet_video_remastered.impl;
 
 import com.toxicstoxm.velvet_video_remastered.ISeekableOutput;
 import com.toxicstoxm.velvet_video_remastered.VelvetVideoException;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -13,7 +14,7 @@ public class FileSeekableOutput implements ISeekableOutput {
     private SeekableByteChannel channel;
     private FileOutputStream fos;
 
-    public FileSeekableOutput(FileOutputStream fos) {
+    public FileSeekableOutput(@NotNull FileOutputStream fos) {
         this.fos = fos;
         this.channel = fos.getChannel();
     }

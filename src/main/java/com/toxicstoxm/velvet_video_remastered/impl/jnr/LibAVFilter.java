@@ -85,5 +85,4 @@ public interface LibAVFilter {
 		public Signed32 pad_idx = new Signed32();
 		public Pointer next = new Pointer();
 	}
-
 }

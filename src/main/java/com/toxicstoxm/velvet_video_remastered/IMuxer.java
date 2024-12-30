@@ -31,5 +31,4 @@ public interface IMuxer extends AutoCloseable {
 	 */
 	@Override
 	void close();
-
 }

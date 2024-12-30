@@ -3,10 +3,12 @@ package com.toxicstoxm.velvet_video_remastered.impl.middle;
 import com.toxicstoxm.velvet_video_remastered.IAudioDecoderStream;
 import com.toxicstoxm.velvet_video_remastered.IAudioFrame;
 import com.toxicstoxm.velvet_video_remastered.impl.JNRHelper;
+import com.toxicstoxm.velvet_video_remastered.impl.Libraries;
 import com.toxicstoxm.velvet_video_remastered.impl.VelvetVideoLib.DemuxerImpl.AbstractDecoderStream;
 import com.toxicstoxm.velvet_video_remastered.impl.jnr.*;
 import jnr.ffi.Pointer;
 import jnr.ffi.Struct;
+import org.jetbrains.annotations.NotNull;
 
 import javax.sound.sampled.AudioFormat;
 
@@ -19,8 +21,8 @@ public class AudioFrameHolder implements AutoCloseable, IFrameHolder {
 	private AudioFormat userFormat;
 	private AVSampleFormat userSampleFormat;
 
-	private static final LibAVUtil libavutil = JNRHelper.load(LibAVUtil.class, "avutil", 56);
-	private static final LibSwResample libavresample = JNRHelper.load(LibSwResample.class, "swresample", 3);
+	private static final LibAVUtil libavutil = JNRHelper.load(LibAVUtil.class, Libraries.avutil, Libraries.avutil_version);
+	private static final LibSwResample libavresample = JNRHelper.load(LibSwResample.class, Libraries.swresample, Libraries.swresample_version);
 	private Pointer[] userBuffer;
 	private int userBufferSamplesSize;
 	private int frameSamples;
@@ -66,7 +68,7 @@ public class AudioFrameHolder implements AutoCloseable, IFrameHolder {
 		return libavutil.av_get_default_channel_layout(targetChannels);
 	}
 
-	private byte[] samples(AVFrame frame) {
+	private byte @NotNull [] samples(@NotNull AVFrame frame) {
 		reallocUserBuffer(frame.nb_samples.get());
 		int frame_count = libavresample.swr_convert(swrContext, userBuffer, userBufferSamplesSize, JNRHelper.ptr(frame.data[0]), userBufferSamplesSize);
     	int bytesCount = frame_count * bytesPerSample;
@@ -89,7 +91,7 @@ public class AudioFrameHolder implements AutoCloseable, IFrameHolder {
 		return frameSamples * userSampleFormat.bytesPerSample() * userFormat.getChannels();
 	}
 
-	public int put(byte[] samples, int offset) {
+	public int put(byte @NotNull [] samples, int offset) {
 		reallocUserBuffer(frameSamples);
 		int sampleBytes = Math.min(frameBytes(), samples.length - offset);
 		int sampleCount = sampleBytes / bytesPerSample;
@@ -110,7 +112,6 @@ public class AudioFrameHolder implements AutoCloseable, IFrameHolder {
 
 	@Override
 	public AVFrame frame() {
-		// TODO
 		return frame;
 	}
 

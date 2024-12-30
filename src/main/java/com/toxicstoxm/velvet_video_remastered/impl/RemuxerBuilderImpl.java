@@ -27,5 +27,4 @@ public class RemuxerBuilderImpl implements IRemuxerBuilder {
 		this.timebaseDen = den;
 		return this;
 	}
-
 }
