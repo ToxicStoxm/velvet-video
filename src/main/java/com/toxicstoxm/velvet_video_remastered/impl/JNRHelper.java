@@ -1,6 +1,7 @@
 package com.toxicstoxm.velvet_video_remastered.impl;
 
 import com.toxicstoxm.velvet_video_remastered.VelvetVideoException;
+import com.toxicstoxm.velvet_video_remastered.tools.logging.VelvetVideoLogAreaBundle;
 import jnr.ffi.LibraryLoader;
 import jnr.ffi.Pointer;
 import jnr.ffi.Runtime;
@@ -8,16 +9,12 @@ import jnr.ffi.Struct;
 import jnr.ffi.byref.PointerByReference;
 import jnr.ffi.provider.ParameterFlags;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
 public class JNRHelper {
-
-	private static final Logger LOG = LoggerFactory.getLogger("velvet-video");
 	private static final Map<Class<?>, Object> libCache = new HashMap<>();
 
 	@SuppressWarnings("unchecked")
@@ -27,20 +24,20 @@ public class JNRHelper {
 
 	private static <L> L forceLoad(Class<L> clazz, String libShortName, int libVersion) {
 		try {
-			LOG.atDebug().addArgument(libShortName).addArgument(libVersion).log("Requesting loading native lib {}.{}");
-			System.out.println("Loading native library: " + libShortName);
+			VelvetVideoLib.getLogger().debug("Requesting loading native lib " + libShortName + "." + libVersion, new VelvetVideoLogAreaBundle.VelvetVideo());
+			VelvetVideoLib.getLogger().debug("Loading native library: " + libShortName, new VelvetVideoLogAreaBundle.VelvetVideo());
 			System.loadLibrary(libShortName); // Load system library
-			System.out.println("Native library loaded: " + libShortName);
+			VelvetVideoLib.getLogger().debug("Native library loaded: " + libShortName, new VelvetVideoLogAreaBundle.VelvetVideo());
 			LibraryLoader<L> loader = LibraryLoader.create(clazz);
-			System.out.println("LibraryLoader created for: " + clazz.getName());
+			VelvetVideoLib.getLogger().debug("LibraryLoader created for: " + clazz.getName(), new VelvetVideoLogAreaBundle.VelvetVideo());
 			loader.failImmediately();
-			System.out.println("LibraryLoader configured to fail immediately.");
+			VelvetVideoLib.getLogger().debug("LibraryLoader configured to fail immediately.", new VelvetVideoLogAreaBundle.VelvetVideo());
 			L lib = loader.load(libShortName);
-			System.out.println("Library successfully loaded: " + libShortName);
-			LOG.atDebug().addArgument(libShortName).log("Loaded {}");
+			VelvetVideoLib.getLogger().debug("Library successfully loaded: " + libShortName, new VelvetVideoLogAreaBundle.VelvetVideo());
+			VelvetVideoLib.getLogger().debug("Loaded " + libShortName, new VelvetVideoLogAreaBundle.VelvetVideo());
 			return lib;
 		} catch (UnsatisfiedLinkError e) {
-            LOG.error("Error loading native library {}", libShortName, e);
+			VelvetVideoLib.getLogger().error("Error loading native library " + libShortName + ". Error message: \"" + e.getMessage() + "\"", new VelvetVideoLogAreaBundle.VelvetVideo());
 			throw new VelvetVideoException("Error loading native library " + libShortName, e);
 		}
 	}
@@ -68,11 +65,10 @@ public class JNRHelper {
 	public static int preload(String libShortName, int libVersion) {
 		try {
 			System.loadLibrary(libShortName);
-			LOG.atDebug().addArgument(libShortName).log("Preloaded native library: {}");
+			VelvetVideoLib.getLogger().debug("Preloaded native library: " + libShortName, new VelvetVideoLogAreaBundle.VelvetVideo());
 			return 0;
 		} catch (LinkageError e) {
-			LOG.atError().addArgument(libShortName).addArgument(e.getMessage())
-					.log("Error preloading native library {} : {}");
+			VelvetVideoLib.getLogger().error("Error preloading native library " + libShortName + " : " + e.getMessage());
 			return -1;
 		}
 	}

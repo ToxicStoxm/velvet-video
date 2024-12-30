@@ -2,6 +2,7 @@ package com.toxicstoxm.velvet_video_remastered.impl.middle;
 
 import com.toxicstoxm.velvet_video_remastered.impl.JNRHelper;
 import com.toxicstoxm.velvet_video_remastered.impl.Libraries;
+import com.toxicstoxm.velvet_video_remastered.impl.VelvetVideoLib;
 import com.toxicstoxm.velvet_video_remastered.impl.jnr.AVCodecContext;
 import com.toxicstoxm.velvet_video_remastered.impl.jnr.AVFrame;
 import com.toxicstoxm.velvet_video_remastered.impl.jnr.LibAVFilter;
@@ -10,20 +11,17 @@ import com.toxicstoxm.velvet_video_remastered.impl.jnr.LibAVFilter.AVFilterConte
 import com.toxicstoxm.velvet_video_remastered.impl.jnr.LibAVFilter.AVFilterGraph;
 import com.toxicstoxm.velvet_video_remastered.impl.jnr.LibAVFilter.AVFilterInOut;
 import com.toxicstoxm.velvet_video_remastered.impl.jnr.LibAVUtil;
+import com.toxicstoxm.velvet_video_remastered.tools.logging.VelvetVideoLogAreaBundle;
 import jnr.ffi.Pointer;
 import jnr.ffi.Struct;
 import jnr.ffi.byref.PointerByReference;
 import jnr.ffi.provider.jffi.NativeRuntime;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Filters implements AutoCloseable {
 
 	private final static LibAVFilter libavfilter = JNRHelper.load(LibAVFilter.class, Libraries.avfilter, Libraries.avfilter_version);
 	private static final LibAVUtil libavutil = JNRHelper.load(LibAVUtil.class, Libraries.avutil, Libraries.avutil_version);
-
-	private final Logger logFilter = LoggerFactory.getLogger("velvet-video.filter");
 
 	private final AVFilterContext buffersrc_ctx;
 	private final AVFilterContext buffersink_ctx;
@@ -92,23 +90,27 @@ public class Filters implements AutoCloseable {
 			libavutil.checkcode(libavutil.av_frame_get_buffer(workframe, 0));
 		}
 
-		logFilter.atDebug()
-				.log(inputframe == null ? "filter flush" : "frame send to filter PTS=" + inputframe.pts.get());
+
+		if (inputframe == null) {
+			VelvetVideoLib.getLogger().debug("filter flush", new VelvetVideoLogAreaBundle.Filter());
+		} else {
+			VelvetVideoLib.getLogger().debug("frame send to filter PTS=" + inputframe.pts.get(), new VelvetVideoLogAreaBundle.Filter());
+		}
 		libavutil.checkcode(libavfilter.av_buffersrc_write_frame(buffersrc_ctx, inputframe));
 		int res = libavfilter.av_buffersink_get_frame(buffersink_ctx, workframe);
 		if (res == LibAVUtil.AVERROR_EAGAIN || res == LibAVUtil.AVERROR_EOF) {
 			if (inputframe == null)
-				logFilter.atDebug().log("filter buffers empty");
+				VelvetVideoLib.getLogger().debug("filter buffers empty", new VelvetVideoLogAreaBundle.Filter());
 			return null;
 		}
 		libavutil.checkcode(res);
-		logFilter.atDebug().addArgument(workframe.pts.get()).log("filter returned frame PTS={}");
+		VelvetVideoLib.getLogger().debug("filter returned frame PTS=" + workframe.pts.get(), new VelvetVideoLogAreaBundle.Filter());
 
 		return workframe;
 	}
 
 	public void reset() {
-		logFilter.atDebug().log("draining filters");
+		VelvetVideoLib.getLogger().debug("draining filters", new VelvetVideoLogAreaBundle.Filter());
 		while (libavfilter.av_buffersink_get_frame(buffersink_ctx, workframe) >= 0);
 	}
 
