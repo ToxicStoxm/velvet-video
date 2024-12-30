@@ -10,10 +10,7 @@ import com.toxicstoxm.velvet_video_remastered.tools.logging.VelvetVideoLogAreaBu
 import jnr.ffi.Pointer;
 import jnr.ffi.Struct;
 import jnr.ffi.byref.PointerByReference;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -39,6 +36,8 @@ public class VelvetVideoLib implements IVelvetVideoLib {
 	@Getter
 	private static Logger logger;
 
+	private static boolean init = false;
+
     private final LibAVUtil libavutil = JNRHelper.load(LibAVUtil.class, Libraries.avutil, Libraries.avutil_version);
     @SuppressWarnings("unused")
 	private final LibSwResample dummyswresample = JNRHelper.load(LibSwResample.class, Libraries.swresample, Libraries.swresample_version);
@@ -50,22 +49,26 @@ public class VelvetVideoLib implements IVelvetVideoLib {
 
     private static volatile IVelvetVideoLib instance;
 
-	public static IVelvetVideoLib getInstance(@Nullable Logger logger) {
+	public static void initialize(@Nullable Logger logger) {
+		if (VelvetVideoLib.init) return;
+		VelvetVideoLib.logger = logger == null ?
+				_ -> {} :
+				logger;
+	}
+
+	public static IVelvetVideoLib getInstance() {
+		if (!init) VelvetVideoLib.initialize(null);
 		if (instance == null) {
 			synchronized (VelvetVideoLib.class) {
 				if (instance == null) {
-					instance = new VelvetVideoLib(logger == null ?
-							_ -> {} :
-							logger
-					);
+					instance = new VelvetVideoLib();
 				}
 			}
 		}
 		return instance;
 	}
 
-    private VelvetVideoLib(Logger logger) {
-		VelvetVideoLib.logger = logger;
+    private VelvetVideoLib() {
     }
 
     private int checkcode(int code) {
